@@ -1,0 +1,19 @@
+{
+  "name": "static-storage",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "postinstall": "rm -f node_modules/static-storage && ln -s ../src/ node_modules/static-storage"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": "4.2.x"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.2.33",
+    "debug": "^2.2.0",
+    "mkdirp-promise": "^1.0.3"
+  }
+}
