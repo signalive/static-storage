@@ -166,8 +166,8 @@ class s3 {
 
   /**
    * Moves file.
-   * @param {string} from
-   * @param {string} to
+   * @param {string} src Path of source file.
+   * @param {string} dst Path of distance file.
    * @returns {Promise}
    */
   move(src, dst) {
