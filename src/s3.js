@@ -60,6 +60,27 @@ class s3 {
       });
   }
 
+  /**
+   * Generic read method to read file from bucket.
+   * @param {string} path
+   * @returns {Promise}
+   */
+  readObject(path) {
+      return new Promise((resolve, reject) => {
+          var params = {Bucket: this.bucketName, Key: path};
+
+          this.awsS3.getObject(params, (err, data) => {
+              if (err) {
+                  debug('S3 reading failed.', err);
+                  return reject(err);
+              }
+
+              debug('S3 reading succeeded:');
+              resolve(data);
+          });
+      });
+  }
+
 
   /**
    * Generic upload method to upload a file from the local fs to the s3 bucket.
