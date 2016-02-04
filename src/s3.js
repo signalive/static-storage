@@ -3,7 +3,6 @@
 const fs = require('fs');
 const awsSdk = require('aws-sdk');
 const debug = require('debug')('staticstorage:s3');
-const awsS3 = new awsSdk.S3();
 
 class s3 {
   constructor(configParams) {
@@ -11,6 +10,7 @@ class s3 {
     this.tmpFolderPath = configParams.staticstorage.tmpFolderPath;
     this.bucketName = configParams.aws.s3.bucket;
     awsSdk.config.update(configParams.aws.general);
+    this.awsS3 = new awsSdk.S3();
   }
 
   /**
@@ -57,7 +57,9 @@ class s3 {
           const readStream = fs.createReadStream(file);
           readStream.on('open', () => {
               debug('Started to read input and upload to s3.');
-              awsS3.putObject(params, (err, data) => {
+
+              params.Body = readStream;
+              this.awsS3.putObject(params, (err, data) => {
                   if (err) {
                       debug('S3 upload failed.', err);
                       return reject(err);
@@ -85,7 +87,7 @@ class s3 {
           };
 
           debug('Started to read input and upload to s3.');
-          awsS3.deleteObject(params, (err, data) => {
+          this.awsS3.deleteObject(params, (err, data) => {
               if (err) {
                   debug('Could not delete file: ' + path, err);
                   return reject(err);
@@ -107,7 +109,7 @@ class s3 {
   copy(src, dst) {
       return new Promise((resolve, reject) => {
           debug('Copying file ' + src + ' to ' + dst + '.');
-          awsS3.copyObject({
+          this.awsS3.copyObject({
               Bucket: this.bucketName,
               copySource: src,
               Key: dst,
