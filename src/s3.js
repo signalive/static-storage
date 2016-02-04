@@ -23,7 +23,6 @@ class s3 {
       return this.uploadToS3(src, {
           Bucket: this.bucketName,
           Key: dst,
-          Body: readStream,
           ACL: 'public-read'
       });
   }
@@ -39,7 +38,6 @@ class s3 {
       return this.uploadToS3(src, {
           Bucket: this.bucketName,
           Key: this.tmpFolderPath + '/' + dst,
-          Body: readStream,
           ACL: 'public-read'
       });
   }
@@ -53,7 +51,7 @@ class s3 {
    */
   uploadToS3(file, params) {
       return new Promise((resolve, reject) => {
-          debug('Uploading from local "%s" to bucket named "s3" as "%s".', file, this.bucketName, path);
+          debug('Uploading from local "%s" to bucket named "s3" as "%s".', file, this.bucketName);
           const readStream = fs.createReadStream(file);
           readStream.on('open', () => {
               debug('Started to read input and upload to s3.');
