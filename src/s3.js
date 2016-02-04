@@ -148,7 +148,7 @@ class s3 {
           debug('Copying file ' + src + ' to ' + dst + '.');
           this.awsS3.copyObject({
               Bucket: this.bucketName,
-              copySource: src,
+              CopySource: this.bucketName + '/' + src,
               Key: dst,
               ACL: 'public-read'
           }, (err, data) => {
