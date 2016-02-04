@@ -119,7 +119,7 @@ class s3 {
       debug('Removing from bucket named "s3" as "%s".', this.bucketName, path);
       return new Promise((resolve, reject) => {
           var params = {
-              Bucket: bucketName,
+              Bucket: this.bucketName,
               Key: path
           };
 
