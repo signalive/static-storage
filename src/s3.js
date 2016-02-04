@@ -42,6 +42,24 @@ class s3 {
       });
   }
 
+  /**
+   * Generic list method to list files of current s3 bucket.
+   * @returns {Promise}
+   */
+  listBucketObjects() {
+      return new Promise((resolve, reject) => {
+          this.awsS3.listObjects({ Bucket: this.bucketName }, (err, data) => {
+              if (err) {
+                  debug('S3 listing failed.', err);
+                  return reject(err);
+              }
+
+              debug('S3 listing succeeded:');
+              resolve(data);
+          });
+      });
+  }
+
 
   /**
    * Generic upload method to upload a file from the local fs to the s3 bucket.
