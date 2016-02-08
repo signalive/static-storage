@@ -65,7 +65,7 @@ class s3 {
    * @param {string} path
    * @returns {Promise}
    */
-  readObject(path) {
+  read(path) {
       return new Promise((resolve, reject) => {
           var params = {Bucket: this.bucketName, Key: path};
 
