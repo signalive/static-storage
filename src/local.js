@@ -3,10 +3,12 @@
 const fs = require('fs');
 const mkdirp = require('mkdirp-promise');
 const debug = require('debug')('staticstore:local');
+const rmdir = require('rimraf');
 
 class local {
   constructor(configParams) {
       this.config = configParams;
+      this.tmpFolderPath = configParams.staticstorage.tmpFolderPath;
       this.rootPath = configParams.staticstorage.rootPath;
   }
 
@@ -23,7 +25,7 @@ class local {
    * @returns {Promise}
    */
   upload(src, dst) {
-      return this.uploadToLocal(src, config.rootPath + this.addSlash(dst));
+      return this.uploadToLocal(src, this.rootPath + this.addSlash(dst));
   }
 
 
@@ -34,21 +36,43 @@ class local {
    * @returns {Promise}
    */
   uploadToTmp(src, dst) {
-      return this.uploadToLocal(src, config.rootPath + tmpFolderPath + this.addSlash(dst));
+      return this.uploadToLocal(src, this.tmpFolderPath + this.addSlash(dst));
   }
 
 
   /**
-   * Generic upload method to upload a file from the local fs to cdn.
-   * @param {string} file
-   * @param {Object} params
+   * Generic upload method to upload a file to local.
+   * @param {string} src
+   * @param {Object} dst
    * @returns {Promise}
    */
   uploadToLocal(src, dst) {
       debug(`Uploading from "${src}" to "${dst}".`);
       const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
       return mkdirp(dstFolder)
-          .then(done => copy_(src, dst));
+          .then(done => this.copy(src, dst));
+  }
+
+
+  /**
+   * Generic read method to read file.
+   * @param {string} path
+   * @returns {Promise}
+   */
+  read(path) {
+      return new Promise((resolve, reject) => {
+
+          fs.readFile(path, function (err,data) {
+              if (err) {
+                  debug('An error occured.');
+                  return reject(err);
+              }
+
+              debug('File read succeeded:');
+              resolve(data);
+          });
+
+      });
   }
 
 
@@ -59,9 +83,24 @@ class local {
    */
   remove(path) {
       return new Promise((resolve, reject) => {
-          fs.unlink(config.rootPath + this.addSlash(path), err => {
+          path = this.rootPath + this.addSlash(path);
+
+          fs.lstat(path, (err, stats) => {
               if (err) return reject(err);
-              resolve();
+
+              if (stats.isDirectory()) {
+                  debug('Removing folder "%s".', path);
+                  rmdir(path, err => {
+                      if (err) return reject(err);
+                      resolve();
+                  });
+              } else {
+                  debug('Removing file "%s".', path);
+                  fs.unlink(path, err => {
+                      if (err) return reject(err);
+                      resolve();
+                  });
+              }
           });
       });
   }
@@ -73,8 +112,9 @@ class local {
    * @param {string} dst
    * @returns {Promise}
    */
-  copy_(src, dst) {
-      debug(`Copying file from ${src} to ${dst}`);
+  copy(src, dst) {
+      debug('Copying file from %s to %s', src, dst);
+      dst = this.rootPath + this.addSlash(dst);
       const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
       return mkdirp(dstFolder)
           .then(() => {
@@ -94,7 +134,7 @@ class local {
 
                   writeStream.on('finish', () => {
                       debug('Writing stream finished.');
-                      resolve();
+                      resolve(src);
                   });
               });
           });
@@ -102,25 +142,14 @@ class local {
 
 
   /**
-   * Copies an existing file to a new location.
+   * Moves file.
    * @param {string} src
    * @param {string} dst
    * @returns {Promise}
    */
-  copy(src, dst) {
-      return this.copy_(config.rootPath + this.addSlash(src), config.rootPath + this.addSlash(dst));
-  }
-
-
-  /**
-   * Moves file.
-   * @param {string} from
-   * @param {string} to
-   * @returns {Promise}
-   */
   move(src, dst) {
-      return copy(src, dst)
-          .then(() => remove(src));
+      return this.copy(src, dst)
+          .then(() => this.remove(src));
   }
 }
 
