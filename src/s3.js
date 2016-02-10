@@ -67,7 +67,7 @@ class s3 {
    */
   read(path) {
       return new Promise((resolve, reject) => {
-          var params = {Bucket: this.bucketName, Key: path};
+          const params = {Bucket: this.bucketName, Key: path};
 
           this.awsS3.getObject(params, (err, data) => {
               if (err) {
@@ -118,7 +118,7 @@ class s3 {
   remove(path) {
       debug('Removing from bucket named "s3" as "%s".', this.bucketName, path);
       return new Promise((resolve, reject) => {
-          var params = {
+          const params = {
               Bucket: this.bucketName,
               Key: path
           };
