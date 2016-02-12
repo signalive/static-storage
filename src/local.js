@@ -12,7 +12,13 @@ class local {
       this.rootPath = configParams.staticstorage.rootPath;
   }
 
-  addSlash(str) {
+  /**
+   * Adds slash if str params not has on first.
+   * @param {String} str
+   * @returns {string}
+   * @private
+   */
+  addSlash_(str) {
       if (!str || str[0] == '/') return str;
       return '/' + str;
   }
@@ -25,7 +31,7 @@ class local {
    * @returns {Promise}
    */
   upload(src, dst) {
-      return this.uploadToLocal(src, this.rootPath + this.addSlash(dst));
+      return this.uploadToLocal(src, this.rootPath + this.addSlash_(dst));
   }
 
 
@@ -36,7 +42,7 @@ class local {
    * @returns {Promise}
    */
   uploadToTmp(src, dst) {
-      return this.uploadToLocal(src, this.tmpFolderPath + this.addSlash(dst));
+      return this.uploadToLocal(src, this.tmpFolderPath + this.addSlash_(dst));
   }
 
 
@@ -55,23 +61,32 @@ class local {
 
 
   /**
-   * Generic read method to read file.
+   * Generic download method.
    * @param {string} path
    * @returns {Promise}
    */
-  read(path) {
+  downloadToLocalTmp(path) {
       return new Promise((resolve, reject) => {
+          const tmpFileName = this.tmpFolderPath +
+              this.addSlash_(new Date().getTime() + path.slice(path.lastIndexOf('.')));
 
-          fs.readFile(path, function (err,data) {
-              if (err) {
-                  debug('An error occured.');
-                  return reject(err);
-              }
+          const readStream = fs.createReadStream(path);
+          const writeStream = fs.createWriteStream(tmpFileName);
 
-              debug('File read succeeded:');
-              resolve(data);
+          readStream.on('open', () => {
+              debug('Read stream is open, starting to pipe.');
+              readStream.pipe(writeStream);
           });
 
+          writeStream.on('error', err => {
+              debug('An error occured.');
+              reject(err);
+          });
+
+          writeStream.on('finish', () => {
+              debug('Writing stream finished.');
+              resolve(tmpFileName);
+          });
       });
   }
 
@@ -83,7 +98,7 @@ class local {
    */
   remove(path) {
       return new Promise((resolve, reject) => {
-          path = this.rootPath + this.addSlash(path);
+          path = this.rootPath + this.addSlash_(path);
 
           fs.lstat(path, (err, stats) => {
               if (err) return reject(err);
@@ -114,7 +129,7 @@ class local {
    */
   copy(src, dst) {
       debug('Copying file from %s to %s', src, dst);
-      dst = this.rootPath + this.addSlash(dst);
+      dst = this.rootPath + this.addSlash_(dst);
       const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
       return mkdirp(dstFolder)
           .then(() => {

@@ -14,6 +14,17 @@ class s3 {
   }
 
   /**
+   * Adds slash if str params not has on first.
+   * @param {String} str
+   * @returns {string}
+   * @private
+   */
+  addSlash_(str) {
+      if (!str || str[0] == '/') return str;
+      return '/' + str;
+  }
+
+  /**
    * Uploads a file from local fs to the s3 bucket.
    * @param {string} src
    * @param {string} dst
@@ -60,23 +71,29 @@ class s3 {
       });
   }
 
+
   /**
-   * Generic read method to read file from bucket.
+   * Generic download method.
    * @param {string} path
    * @returns {Promise}
    */
-  read(path) {
+  downloadToLocalTmp(path) {
       return new Promise((resolve, reject) => {
+          const tmpFileName = this.tmpFolderPath + this.addSlash_(new Date().getTime() + path.slice(path.lastIndexOf('.')));
           const params = {Bucket: this.bucketName, Key: path};
+          const writeStream = fs.createWriteStream(tmpFileName);
+          const readStream = this.awsS3.getObject(params).createReadStream();
 
-          this.awsS3.getObject(params, (err, data) => {
-              if (err) {
-                  debug('S3 reading failed.', err);
-                  return reject(err);
-              }
+          readStream.pipe(writeStream);
 
-              debug('S3 reading succeeded:');
-              resolve(data);
+          writeStream.on('error', err => {
+              debug('An error occured.');
+              reject(err);
+          });
+
+          writeStream.on('finish', () => {
+              debug('Writing stream finished.');
+              resolve(tmpFileName);
           });
       });
   }
