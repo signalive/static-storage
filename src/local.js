@@ -133,7 +133,6 @@ class local {
    */
   copy(src, dst) {
       debug('Copying file from %s to %s', src, dst);
-      dst = this.rootPath + this.addSlash_(dst);
       const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
       return mkdirp(dstFolder)
           .then(() => {
@@ -167,7 +166,7 @@ class local {
    * @returns {Promise}
    */
   move(src, dst) {
-      return this.copy(src, dst)
+      return this.copy(src, path.join(this.rootPath, dst))
           .then(() => this.remove(src));
   }
 }
