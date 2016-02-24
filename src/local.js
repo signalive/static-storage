@@ -1,15 +1,19 @@
 'use strict';
 
+const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp-promise');
 const debug = require('debug')('staticstore:local');
 const rmdir = require('rimraf');
+
 
 class local {
   constructor(configParams) {
       this.config = configParams;
       this.tmpFolderPath = configParams.staticstorage.tmpFolderPath;
       this.rootPath = configParams.staticstorage.rootPath;
+
+      mkdirp(path.join(this.rootPath, this.tmpFolderPath));
   }
 
   /**
@@ -31,7 +35,7 @@ class local {
    * @returns {Promise}
    */
   upload(src, dst) {
-      return this.uploadToLocal(src, this.rootPath + this.addSlash_(dst));
+      return this.uploadToLocal(src, path.join(this.rootPath, dst));
   }
 
 
@@ -42,7 +46,7 @@ class local {
    * @returns {Promise}
    */
   uploadToTmp(src, dst) {
-      return this.uploadToLocal(src, this.tmpFolderPath + this.addSlash_(dst));
+      return this.uploadToLocal(src, path.join(this.rootPath, this.tmpFolderPath, dst));
   }
 
 
@@ -62,56 +66,56 @@ class local {
 
   /**
    * Generic download method.
-   * @param {string} path
+   * @param {string} downloadPath
    * @returns {Promise}
    */
-  downloadToLocalTmp(path) {
-      return new Promise((resolve, reject) => {
-          const tmpFileName = this.tmpFolderPath +
-              this.addSlash_(new Date().getTime() + path.slice(path.lastIndexOf('.')));
+  downloadToLocalTmp(downloadPath) {
+      return mkdirp(path.join('./', this.tmpFolderPath))
+            .then(() => new Promise((resolve, reject) => {
+                const tmpFileName = path.join('./', this.tmpFolderPath,
+                    new Date().getTime() + downloadPath.slice(downloadPath.lastIndexOf('.')));
 
-          const readStream = fs.createReadStream(path);
-          const writeStream = fs.createWriteStream(tmpFileName);
+                const readStream = fs.createReadStream(downloadPath);
+                const writeStream = fs.createWriteStream(tmpFileName);
 
-          readStream.on('open', () => {
-              debug('Read stream is open, starting to pipe.');
-              readStream.pipe(writeStream);
-          });
+                readStream.on('open', () => {
+                    debug('Read stream is open, starting to pipe.');
+                    readStream.pipe(writeStream);
+                });
 
-          writeStream.on('error', err => {
-              debug('An error occured.');
-              reject(err);
-          });
+                writeStream.on('error', err => {
+                    debug('An error occured.', err);
+                    reject(err);
+                });
 
-          writeStream.on('finish', () => {
-              debug('Writing stream finished.');
-              resolve(tmpFileName);
-          });
-      });
+                writeStream.on('finish', () => {
+                    debug('Writing stream finished.');
+                    resolve(tmpFileName);
+                });
+            }));
   }
 
 
   /**
    * Removes an existing file.
-   * @param {string} path
+   * @param {string} removePath
    * @returns {Promise}
    */
-  remove(path) {
+  remove(removePath) {
+      debug('Removing file at', removePath);
       return new Promise((resolve, reject) => {
-          path = this.rootPath + this.addSlash_(path);
-
-          fs.lstat(path, (err, stats) => {
+          fs.lstat(removePath, (err, stats) => {
               if (err) return reject(err);
 
               if (stats.isDirectory()) {
-                  debug('Removing folder "%s".', path);
-                  rmdir(path, err => {
+                  debug('Removing folder "%s".', removePath);
+                  rmdir(removePath, err => {
                       if (err) return reject(err);
                       resolve();
                   });
               } else {
-                  debug('Removing file "%s".', path);
-                  fs.unlink(path, err => {
+                  debug('Removing file "%s".', removePath);
+                  fs.unlink(removePath, err => {
                       if (err) return reject(err);
                       resolve();
                   });
@@ -129,7 +133,6 @@ class local {
    */
   copy(src, dst) {
       debug('Copying file from %s to %s', src, dst);
-      dst = this.rootPath + this.addSlash_(dst);
       const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
       return mkdirp(dstFolder)
           .then(() => {
@@ -163,7 +166,7 @@ class local {
    * @returns {Promise}
    */
   move(src, dst) {
-      return this.copy(src, dst)
+      return this.copy(src, path.join(this.rootPath, dst))
           .then(() => this.remove(src));
   }
 }
