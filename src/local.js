@@ -12,6 +12,8 @@ class local {
       this.config = configParams;
       this.tmpFolderPath = configParams.staticstorage.tmpFolderPath;
       this.rootPath = configParams.staticstorage.rootPath;
+
+      mkdirp(path.join(this.rootPath, this.tmpFolderPath));
   }
 
   /**
