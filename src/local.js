@@ -1,9 +1,11 @@
 'use strict';
 
+const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp-promise');
 const debug = require('debug')('staticstore:local');
 const rmdir = require('rimraf');
+
 
 class local {
   constructor(configParams) {
@@ -31,7 +33,7 @@ class local {
    * @returns {Promise}
    */
   upload(src, dst) {
-      return this.uploadToLocal(src, this.rootPath + this.addSlash_(dst));
+      return this.uploadToLocal(src, path.join(this.rootPath, dst));
   }
 
 
@@ -42,7 +44,7 @@ class local {
    * @returns {Promise}
    */
   uploadToTmp(src, dst) {
-      return this.uploadToLocal(src, this.tmpFolderPath + this.addSlash_(dst));
+      return this.uploadToLocal(src, path.join(this.rootPath, this.tmpFolderPath, dst));
   }
 
 
@@ -93,25 +95,24 @@ class local {
 
   /**
    * Removes an existing file.
-   * @param {string} path
+   * @param {string} removePath
    * @returns {Promise}
    */
-  remove(path) {
+  remove(removePath) {
+      debug('Removing file at', removePath);
       return new Promise((resolve, reject) => {
-          path = this.rootPath + this.addSlash_(path);
-
-          fs.lstat(path, (err, stats) => {
+          fs.lstat(removePath, (err, stats) => {
               if (err) return reject(err);
 
               if (stats.isDirectory()) {
-                  debug('Removing folder "%s".', path);
-                  rmdir(path, err => {
+                  debug('Removing folder "%s".', removePath);
+                  rmdir(removePath, err => {
                       if (err) return reject(err);
                       resolve();
                   });
               } else {
-                  debug('Removing file "%s".', path);
-                  fs.unlink(path, err => {
+                  debug('Removing file "%s".', removePath);
+                  fs.unlink(removePath, err => {
                       if (err) return reject(err);
                       resolve();
                   });
