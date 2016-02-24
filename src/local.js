@@ -66,32 +66,33 @@ class local {
 
   /**
    * Generic download method.
-   * @param {string} path
+   * @param {string} downloadPath
    * @returns {Promise}
    */
-  downloadToLocalTmp(path) {
-      return new Promise((resolve, reject) => {
-          const tmpFileName = this.tmpFolderPath +
-              this.addSlash_(new Date().getTime() + path.slice(path.lastIndexOf('.')));
+  downloadToLocalTmp(downloadPath) {
+      return mkdirp(path.join('./', this.tmpFolderPath))
+            .then(() => new Promise((resolve, reject) => {
+                const tmpFileName = path.join('./', this.tmpFolderPath,
+                    new Date().getTime() + downloadPath.slice(downloadPath.lastIndexOf('.')));
 
-          const readStream = fs.createReadStream(path);
-          const writeStream = fs.createWriteStream(tmpFileName);
+                const readStream = fs.createReadStream(downloadPath);
+                const writeStream = fs.createWriteStream(tmpFileName);
 
-          readStream.on('open', () => {
-              debug('Read stream is open, starting to pipe.');
-              readStream.pipe(writeStream);
-          });
+                readStream.on('open', () => {
+                    debug('Read stream is open, starting to pipe.');
+                    readStream.pipe(writeStream);
+                });
 
-          writeStream.on('error', err => {
-              debug('An error occured.');
-              reject(err);
-          });
+                writeStream.on('error', err => {
+                    debug('An error occured.', err);
+                    reject(err);
+                });
 
-          writeStream.on('finish', () => {
-              debug('Writing stream finished.');
-              resolve(tmpFileName);
-          });
-      });
+                writeStream.on('finish', () => {
+                    debug('Writing stream finished.');
+                    resolve(tmpFileName);
+                });
+            }));
   }
 
 
