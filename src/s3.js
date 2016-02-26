@@ -7,11 +7,12 @@ const debug = require('debug')('staticstorage:s3');
 class s3 {
     constructor(configParams) {
         this.config = configParams;
-        this.tmpFolderPath = configParams.staticstorage.tmpFolderPath;
+        this.tmpFolderPath = configParams.staticstorage.tmpFolderPath.slice(1);
         this.bucketName = configParams.aws.s3.bucket;
         awsSdk.config.update(configParams.aws.general);
         this.awsS3 = new awsSdk.S3();
     }
+
 
     /**
      * Adds slash if str params not has on first.
@@ -23,6 +24,7 @@ class s3 {
         if (!str || str[0] == '/') return str;
         return '/' + str;
     }
+
 
     /**
      * Uploads a file from local fs to the s3 bucket.
@@ -48,10 +50,11 @@ class s3 {
     uploadToTmp(src, dst) {
         return this.uploadToS3(src, {
             Bucket: this.bucketName,
-            Key: this.tmpFolderPath + '/' + dst,
+            Key: this.tmpFolderPath + this.addSlash_(dst),
             ACL: 'public-read'
         });
     }
+
 
     /**
      * Generic list method to list files of current s3 bucket.
@@ -113,6 +116,7 @@ class s3 {
     uploadToS3(file, params) {
         return new Promise((resolve, reject) => {
             debug(`Uploading from local ${file} to bucket ${this.bucketName}.`);
+            debug(`Params:`, params);
             const readStream = fs.createReadStream(file);
             readStream.on('open', () => {
                 debug('Started to read input and upload to s3.');
@@ -124,7 +128,7 @@ class s3 {
                         return reject(err);
                     }
 
-                    debug('S3 upload succeeded.');
+                    debug('S3 upload succeeded.', data);
                     resolve(data);
                 });
             });
@@ -194,7 +198,7 @@ class s3 {
      */
     move(src, dst) {
         return this
-            .copy(this.addSlash_(src), this.addSlash_(dst))
+            .copy(src, dst)
             .then(() => this.remove(src));
     }
 }
