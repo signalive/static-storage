@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const fs = require('fs');
 const awsSdk = require('aws-sdk');
 const debug = require('debug')('staticstorage:s3');
@@ -79,31 +80,34 @@ class s3 {
 
     /**
      * Generic download method.
-     * @param {string} path
+     * @param {string} downloadPath
      * @returns {Promise}
      */
-    downloadToLocalTmp(path) {
-        return new Promise((resolve, reject) => {
-            const tmpFileName = this.tmpFolderPath + this.addSlash_(new Date().getTime() + path.slice(path.lastIndexOf('.')));
-            const params = {
-                Bucket: this.bucketName,
-                Key: path
-            };
-            const writeStream = fs.createWriteStream(tmpFileName);
-            const readStream = this.awsS3.getObject(params).createReadStream();
+    downloadToLocalTmp(downloadPath) {
+        return mkdirp(path.join('./', this.tmpFolderPath))
+            .then(() => new Promise((resolve, reject) => {
+                const tmpFileName = path.join('./', this.tmpFolderPath,
+                    new Date().getTime() + downloadPath.slice(downloadPath.lastIndexOf('.')));
+                
+                const params = {
+                    Bucket: this.bucketName,
+                    Key: downloadPath
+                };
+                const writeStream = fs.createWriteStream(tmpFileName);
+                const readStream = this.awsS3.getObject(params).createReadStream();
 
-            readStream.pipe(writeStream);
+                readStream.pipe(writeStream);
 
-            writeStream.on('error', err => {
-                debug('An error occured.');
-                reject(err);
-            });
+                writeStream.on('error', err => {
+                    debug('An error occured.');
+                    reject(err);
+                });
 
-            writeStream.on('finish', () => {
-                debug('Writing stream finished.');
-                resolve(tmpFileName);
-            });
-        });
+                writeStream.on('finish', () => {
+                    debug('Writing stream finished.');
+                    resolve(tmpFileName);
+                });
+            }));
     }
 
 
