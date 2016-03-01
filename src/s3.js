@@ -88,7 +88,7 @@ class s3 {
             .then(() => new Promise((resolve, reject) => {
                 const tmpFileName = path.join('./', this.tmpFolderPath,
                     new Date().getTime() + downloadPath.slice(downloadPath.lastIndexOf('.')));
-                
+
                 const params = {
                     Bucket: this.bucketName,
                     Key: downloadPath
@@ -97,6 +97,11 @@ class s3 {
                 const readStream = this.awsS3.getObject(params).createReadStream();
 
                 readStream.pipe(writeStream);
+
+                readStream.on('error', err => {
+                    debug('An error occured trying to read.');
+                    reject(err);
+                });
 
                 writeStream.on('error', err => {
                     debug('An error occured.');
@@ -122,6 +127,12 @@ class s3 {
             debug(`Uploading from local ${file} to bucket ${this.bucketName}.`);
             debug(`Params:`, params);
             const readStream = fs.createReadStream(file);
+
+            readStream.on('error', err => {
+                debug('An error occured trying to read.');
+                reject(err);
+            });
+
             readStream.on('open', () => {
                 debug('Started to read input and upload to s3.');
 
