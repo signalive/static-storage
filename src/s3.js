@@ -2,6 +2,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const mkdirp = require('mkdirp-promise');
 const awsSdk = require('aws-sdk');
 const debug = require('debug')('staticstorage:s3');
 
