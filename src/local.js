@@ -84,7 +84,13 @@ class local {
                 });
 
                 writeStream.on('error', err => {
-                    debug('An error occured.', err);
+                    debug('An error occured when trying to write.', err);
+                    reject(err);
+                });
+
+
+                readStream.on('error', err => {
+                    debug('An error occured when trying to read.', err);
                     reject(err);
                 });
 
@@ -135,6 +141,7 @@ class local {
         debug(`Copying file from ${src} to ${dst}`);
         const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
         return mkdirp(dstFolder)
+            .then(() => this.stats_(src))
             .then(() => {
                 return new Promise((resolve, reject) => {
                     var readStream = fs.createReadStream(src);
@@ -146,7 +153,12 @@ class local {
                     });
 
                     writeStream.on('error', err => {
-                        debug('An error occured.');
+                        debug('An error occured when trying to write.');
+                        reject(err);
+                    });
+
+                    readStream.on('error', err => {
+                        debug('An error occured when trying to read.');
                         reject(err);
                     });
 
@@ -169,6 +181,16 @@ class local {
         return this
             .copy(path.join(this.rootPath, src), path.join(this.rootPath, dst))
             .then(() => this.remove(path.join(this.rootPath, src)));
+    }
+
+
+    stats_(src) {
+        return new Promise((resolve, reject) => {
+            fs.stat(src, (err, stats) => {
+                if (err) return reject(err);
+                resolve(stats);
+            });
+        });
     }
 }
 
