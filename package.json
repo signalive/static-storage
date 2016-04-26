@@ -1,6 +1,6 @@
 {
   "name": "static-storage",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -14,7 +14,7 @@
   "dependencies": {
     "aws-sdk": "^2.2.33",
     "debug": "^2.2.0",
-    "mkdirp-promise": "^1.0.3",
+    "mkdirp-then": "1.2.0",
     "rimraf": "^2.5.1"
   }
 }

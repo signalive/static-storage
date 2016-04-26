@@ -2,7 +2,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const mkdirp = require('mkdirp-promise');
+const mkdirp = require('mkdirp-then');
 const debug = require('debug')('staticstorage:local');
 const rmdir = require('rimraf');
 
