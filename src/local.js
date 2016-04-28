@@ -108,6 +108,7 @@ class local {
      * @returns {Promise}
      */
     remove(removePath) {
+        removePath = path.join(this.rootPath, removePath);
         debug(`Removing file at ${removePath}`);
         return new Promise((resolve, reject) => {
             fs.lstat(removePath, (err, stats) => {
@@ -126,6 +127,23 @@ class local {
                         resolve();
                     });
                 }
+            });
+        });
+    }
+
+
+    /**
+     * Removes entire folder and its subfolders
+     * @param  {string} folderPath
+     * @return {Promise}
+     */
+    removeFolder(folderPath) {
+        folderPath = path.join(this.rootPath, folderPath);
+        debug(`Removing folder at ${folderPath}`);
+        return new Promise((resolve, reject) => {
+            rmdir(folderPath, err => {
+                if (err) return reject(err);
+                resolve();
             });
         });
     }
@@ -180,7 +198,7 @@ class local {
     move(src, dst) {
         return this
             .copy(path.join(this.rootPath, src), path.join(this.rootPath, dst))
-            .then(() => this.remove(path.join(this.rootPath, src)));
+            .then(_ => this.remove(src));
     }
 
 
