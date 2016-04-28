@@ -180,6 +180,42 @@ class s3 {
 
 
     /**
+     * Removes entire folder and its subfolders
+     * @param  {string} folderPath
+     * @return {Promise}
+     */
+    removeFolder(folderPath) {
+        debug(`Removing folder at ${folderPath}`);
+        return new Promise((resolve, reject) => {
+            this.awsS3.listObjects({
+                Bucket: this.bucketName,
+                Prefix: folderPath
+            }, (err, data) => {
+                if (err) {
+                    debug('S3 listing failed.', err);
+                    return reject(err);
+                }
+
+                if (data.Contents.length == 0) resolve();
+
+                this.awsS3.deleteObjects({
+                    Bucket: this.bucketName,
+                    Delete: {
+                        Objects: data.Contents.map(obj => ({Key: obj.Key}))
+                    }
+                }, err => {
+                    if (err) return reject(err);
+                    
+                    debug(`Successfully removed folder at ${folderPath}`);
+                    resolve();
+                });
+            });
+        });
+    }
+
+
+
+    /**
      * Copies an existing file to a new location.
      * @param {string} src
      * @param {string} dst
