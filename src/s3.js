@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp-then');
 const awsSdk = require('aws-sdk');
-const debug = require('debug')('staticstorage:s3');
+const debug = require('debug')('static-storage:s3');
 
 class s3 {
     constructor(configParams) {
