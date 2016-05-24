@@ -62,7 +62,7 @@ class s3 {
      * Generic list method to list files of current s3 bucket.
      * @returns {Promise}
      */
-    listBucketObjects() {
+    listFiles() {
         return new Promise((resolve, reject) => {
             this.awsS3.listObjects({
                 Bucket: this.bucketName
