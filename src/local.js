@@ -5,6 +5,7 @@ const fs = require('fs');
 const mkdirp = require('mkdirp-then');
 const debug = require('debug')('static-storage:local');
 const rmdir = require('rimraf');
+const fsLister = require('fs-list');
 
 
 class local {
@@ -98,6 +99,21 @@ class local {
                     debug('Writing stream finished.');
                     resolve(tmpFileName);
                 });
+            }));
+    }
+
+
+    /**
+     * Generic list method to list files of current root folder.
+     * @returns {Promise}
+     */
+    listFiles() {
+        return fsLister
+            .listFiles(this.rootPath)
+            .then(fileList => ({
+                Contents: fileList.map(filePath => ({
+                    Key: filePath.replace(path.join(this.rootPath, '/'), '')
+                }))
             }));
     }
 

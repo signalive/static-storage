@@ -1,11 +1,9 @@
 {
   "name": "static-storage",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "",
   "main": "src/index.js",
-  "scripts": {
-
-  },
+  "scripts": {},
   "author": "",
   "license": "ISC",
   "engines": {
@@ -14,6 +12,7 @@
   "dependencies": {
     "aws-sdk": "^2.2.33",
     "debug": "^2.2.0",
+    "fs-list": "0.0.1",
     "mkdirp-then": "1.2.0",
     "rimraf": "^2.5.1"
   }
