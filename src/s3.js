@@ -63,19 +63,45 @@ class s3 {
      * @returns {Promise}
      */
     listFiles() {
-        return new Promise((resolve, reject) => {
-            this.awsS3.listObjects({
-                Bucket: this.bucketName
-            }, (err, data) => {
-                if (err) {
-                    debug('S3 listing failed.', err);
-                    return reject(err);
-                }
+        const MAX_KEYS_COUNT = 1000;
+        let response = null;
 
-                debug('S3 listing succeeded:');
-                resolve(data);
+        // Promisify `awsS3.listObjects`
+        const listObjects_ = (options) => {
+            return new Promise((resolve, reject) => {
+                this.awsS3.listObjects(options, (err, data) => {
+                    if (err) return reject(err);
+                    resolve(data);
+                });
             });
-        });
+        }
+
+        // Recursive list method
+        const list_ = (opt_marker) => {
+            const options = {
+                Bucket: this.bucketName,
+                MaxKeys: MAX_KEYS_COUNT,
+                Marker: opt_marker || ''
+            };
+
+            return listObjects_(options)
+                .then((response_) => {
+                    if (!response)
+                        response = response_;
+
+                    const contents = response_.Contents;
+                    response.Contents = response.Contents.concat(contents);
+
+                    if (contents.length == MAX_KEYS_COUNT) {
+                        const lastContent = contents[contents.length - 1];
+                        return list_(lastContent.Key);
+                    }
+
+                    return response;
+                });
+        }
+
+        return list_();
     }
 
 
@@ -205,7 +231,7 @@ class s3 {
                     }
                 }, err => {
                     if (err) return reject(err);
-                    
+
                     debug(`Successfully removed folder at ${folderPath}`);
                     resolve();
                 });
