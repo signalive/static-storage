@@ -61,7 +61,7 @@ class local {
         debug(`Uploading from ${src} to ${dst}.`);
         const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
         return mkdirp(dstFolder)
-            .then(done => this.copy(src, dst));
+            .then(done => this.copyByAbsolutePaths_(src, dst));
     }
 
 
@@ -171,7 +171,7 @@ class local {
      * @param {string} dst
      * @returns {Promise}
      */
-    copy(src, dst) {
+    copyByAbsolutePaths_(src, dst) {
         debug(`Copying file from ${src} to ${dst}`);
         const dstFolder = dst.slice(0, dst.lastIndexOf('/'));
         return mkdirp(dstFolder)
@@ -206,6 +206,17 @@ class local {
 
 
     /**
+     * Copy method that operates on the server filesystem with relative paths
+     */
+    copy (src, dst) {
+        src = path.join(this.rootPath, src)
+        dst = path.join(this.rootPath, dst);
+
+        return this.copyByAbsolutePaths_(src, dst);
+    }
+
+
+    /**
      * Moves file.
      * @param {string} src
      * @param {string} dst
@@ -213,7 +224,7 @@ class local {
      */
     move(src, dst) {
         return this
-            .copy(path.join(this.rootPath, src), path.join(this.rootPath, dst))
+            .copy(src, dst)
             .then(_ => this.remove(src));
     }
 
