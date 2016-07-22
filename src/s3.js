@@ -279,6 +279,26 @@ class s3 {
             .copy(src, dst)
             .then(() => this.remove(src));
     }
+
+
+    stats_(src) {
+        const params = {
+            Bucket: this.bucketName,
+            Key: src
+        };
+
+        return new Promise((resolve, reject) => this.awsS3.headObject(params, (err, stats) => {
+            if (err) reject(err);
+            else resolve(stats);
+        }));
+    }
+
+
+    getFileSizeInBytes(src) {
+        return this
+            .stats_(src)
+            .then(metadata => parseInt(metadata.ContentLength, 10));
+    }
 }
 
 module.exports = s3;

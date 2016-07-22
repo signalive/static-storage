@@ -237,6 +237,16 @@ class local {
             });
         });
     }
+
+
+    getFileSizeInBytes(src) {
+        src = path.join(this.rootPath, src);
+        debug('Getting filesize of ' + src);
+
+        return this
+            .stats_(src)
+            .then(metadata => metadata.size);      
+    }
 }
 
 
