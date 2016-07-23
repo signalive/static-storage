@@ -5,6 +5,9 @@ const fs = require('fs');
 const mkdirp = require('mkdirp-then');
 const awsSdk = require('aws-sdk');
 const debug = require('debug')('static-storage:s3');
+const MimeDetector = require('mime-types');
+MimeDetector.types.gz = 'application/x-gzip';
+
 
 class s3 {
     constructor(configParams) {
@@ -164,6 +167,8 @@ class s3 {
                 debug('Started to read input and upload to s3.');
 
                 params.Body = readStream;
+                params.ContentType = MimeDetector.lookup(path.extname(file)) || 'application/octet-stream';
+                
                 this.awsS3.putObject(params, (err, data) => {
                     if (err) {
                         debug('S3 upload failed.', err);
