@@ -5,6 +5,9 @@ const fs = require('fs');
 const mkdirp = require('mkdirp-then');
 const awsSdk = require('aws-sdk');
 const debug = require('debug')('static-storage:s3');
+const MimeDetector = require('mime-types');
+MimeDetector.types.gz = 'application/x-gzip';
+
 
 class s3 {
     constructor(configParams) {
@@ -164,6 +167,8 @@ class s3 {
                 debug('Started to read input and upload to s3.');
 
                 params.Body = readStream;
+                params.ContentType = MimeDetector.lookup(path.extname(file)) || 'application/octet-stream';
+                
                 this.awsS3.putObject(params, (err, data) => {
                     if (err) {
                         debug('S3 upload failed.', err);
@@ -278,6 +283,26 @@ class s3 {
         return this
             .copy(src, dst)
             .then(() => this.remove(src));
+    }
+
+
+    stats_(src) {
+        const params = {
+            Bucket: this.bucketName,
+            Key: src
+        };
+
+        return new Promise((resolve, reject) => this.awsS3.headObject(params, (err, stats) => {
+            if (err) reject(err);
+            else resolve(stats);
+        }));
+    }
+
+
+    getFileSizeInBytes(src) {
+        return this
+            .stats_(src)
+            .then(metadata => parseInt(metadata.ContentLength, 10));
     }
 }
 
