@@ -6,9 +6,6 @@
   "scripts": {},
   "author": "",
   "license": "ISC",
-  "engines": {
-    "node": "4.2.x"
-  },
   "dependencies": {
     "aws-sdk": "^2.2.33",
     "debug": "^2.2.0",
