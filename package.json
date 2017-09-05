@@ -1,6 +1,6 @@
 {
   "name": "static-storage",
-  "version": "0.2.11",
+  "version": "0.3.0",
   "description": "",
   "main": "src/index.js",
   "scripts": {},
@@ -8,6 +8,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.2.33",
+    "azure-storage": "^2.3.0",
     "debug": "^2.2.0",
     "fs-list": "0.0.1",
     "mime-types": "^2.1.11",
