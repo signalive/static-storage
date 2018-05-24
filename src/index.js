@@ -6,6 +6,6 @@ module.exports = function(config) {
     if (!strategy)
         throw new Error('Please define staticstorage:strategy in the configuration file.');
 
-    var strategyName = require('./' + strategy);
+    const strategyName = require('./' + strategy);
     return new strategyName(config);
 }
