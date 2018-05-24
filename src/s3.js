@@ -168,7 +168,7 @@ class s3 {
 
                 params.Body = readStream;
                 params.ContentType = MimeDetector.lookup(path.extname(file)) || 'application/octet-stream';
-                
+
                 this.awsS3.putObject(params, (err, data) => {
                     if (err) {
                         debug('S3 upload failed.', err);
