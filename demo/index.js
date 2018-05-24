@@ -14,9 +14,21 @@ const StaticStorage = require('../src')({
     //    "rootPath": "../preserved",
     //    "tmpFolderPath": "/tmp"
     // },
-    'staticstorage': {
-      "strategy": "gcloud",
-      "tmpFolderPath": "/tmp"
+    // 'staticstorage': {
+    //   "strategy": "gcloud",
+    //   "tmpFolderPath": "/tmp"
+    // },
+    staticstorage: {
+      strategy: 'bluemix',
+      tmpFolderPath: '/tmp'
+    },
+    bluemix: {
+      bucketName: '<bucket_name>',
+      locationConstraint: 'us-standard',
+      endpoint: 's3.eu-geo.objectstorage.softlayer.net',
+      apiKeyId: '<api_key_id>',
+      ibmAuthEndpoint: 'https://iam.ng.bluemix.net/oidc/token',
+      serviceInstanceId: '<service_instance_id>',
     },
     'aws': {
         "general": {
@@ -74,6 +86,18 @@ const StaticStorage = require('../src')({
 // StaticStorage.removeFolder('tmp');
 // StaticStorage.downloadToLocalTmp('demo2.txt');
 // StaticStorage.getFileSizeInBytes('demo2.txt').then(a => console.log('a', a));
+
+// Bluemix
+// StaticStorage.move('demo.txt', 'tmp/demo2.txt');
+// StaticStorage.copy('demo.txt', 'demo2.txt');
+// StaticStorage.remove('demo.txt');
+// StaticStorage.upload('./demo.txt', 'test/demo.txt');
+// StaticStorage.upload('demo.txt', 'demo.txt');
+// StaticStorage.uploadToTmp('demo.txt', 'demo-2.txt');
+// StaticStorage.removeFolder('test');
+// StaticStorage.downloadToLocalTmp('demo2.txt');
+// StaticStorage.getFileSizeInBytes('demo2.txt').then(a => console.log('a', a));
+
 
 // Local
 //StaticStorage.upload('demo/demo.txt', 'memo/tempFileName.txt');            // Upload file
