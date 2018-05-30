@@ -12,9 +12,14 @@ MimeDetector.types.gz = 'application/x-gzip';
 class s3 {
     constructor(configParams) {
         this.config = configParams;
-        this.tmpFolderPath = configParams.staticstorage.tmpFolderPath.slice(1);
-        this.bucketName = configParams.aws.s3.bucket;
-        awsSdk.config.update(configParams.aws.general);
+        this.init();
+    }
+
+
+    init() {
+        this.tmpFolderPath = this.config.staticstorage.tmpFolderPath.slice(1);
+        this.bucketName = this.config.aws.s3.bucket;
+        awsSdk.config.update(this.config.aws.general);
         this.awsS3 = new awsSdk.S3();
     }
 
