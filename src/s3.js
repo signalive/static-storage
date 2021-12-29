@@ -70,7 +70,7 @@ class s3 {
      * Generic list method to list files of current s3 bucket.
      * @returns {Promise}
      */
-    listFiles() {
+    listFiles(prefix = '') {
         const MAX_KEYS_COUNT = 1000;
         let response = null;
 
@@ -89,7 +89,8 @@ class s3 {
             const options = {
                 Bucket: this.bucketName,
                 MaxKeys: MAX_KEYS_COUNT,
-                Marker: opt_marker || ''
+                Marker: opt_marker || '',
+                Prefix: prefix || ''
             };
 
             return listObjects_(options)
