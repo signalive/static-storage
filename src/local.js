@@ -107,13 +107,13 @@ class local {
      * Generic list method to list files of current root folder.
      * @returns {Promise}
      */
-    listFiles() {
+    listFiles(filter = '') {
         return fsLister
             .listFiles(this.rootPath)
             .then(fileList => ({
                 Contents: fileList.map(filePath => ({
                     Key: filePath.replace(path.join(this.rootPath, '/'), '')
-                }))
+                })).filter(obj => obj.Key.indexOf(filter) != -1)
             }));
     }
 
