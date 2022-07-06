@@ -1,14 +1,13 @@
 'use strict';
 
 const util = require('util');
-
 const StaticStorage = require('../src')({
     // 'staticstorage': {
     //     "strategy": "azurestorage",
     //     "tmpFolderPath": "/tmp"
     // },
     // 'staticstorage': {
-    //     "strategy": "s3",
+    //     "strategy": "aws",
     //     "tmpFolderPath": "/tmp"
     // },
     // 'staticstorage': {
@@ -25,39 +24,41 @@ const StaticStorage = require('../src')({
       tmpFolderPath: '/tmp',
       rootPath: '/public'
     },
-    bluemix: {
-      bucketName: '<bucket_name>',
-      locationConstraint: 'us-standard',
-      endpoint: 's3.eu-geo.objectstorage.softlayer.net',
-      apiKeyId: '<api_key_id>',
-      ibmAuthEndpoint: 'https://iam.ng.bluemix.net/oidc/token',
-      serviceInstanceId: '<service_instance_id>',
-    },
-    'aws': {
-        "general": {
-            "region": "<region>",
-            "accessKeyId": "<access_key_id>",
-            "secretAccessKey": "<secret_access_key>"
-        },
-        "s3": {
-            "bucket": "<bucket_name>"
-        }
-    },
-    'azure': {
-        "accountName": "<account_name>",
-        "accountKey": "<account_key>",
-        "containerName": "<container_name>"
-    },
-    'gcloud': {
-        "projectId": "<project_id>",
-        "bucketName": "<bucket_name>"
-    },
-    'minio': {
-      "endPoint": "localhost",
-      "port": "9000",
-      "bucketName": "static",
-      "accesskeyid": 'KT5KRrCqk62KSHu8',
-      "secretaccesskey": 'sMelEcokbZcYbRWRjLKasMSO8j5qkFPt',
+    strategySettings: {
+      bluemix: {
+        bucketName: '<bucket_name>',
+        locationConstraint: 'us-standard',
+        endpoint: 's3.eu-geo.objectstorage.softlayer.net',
+        apiKeyId: '<api_key_id>',
+        ibmAuthEndpoint: 'https://iam.ng.bluemix.net/oidc/token',
+        serviceInstanceId: '<service_instance_id>',
+      },
+      'aws': {
+          "general": {
+              "region": "<region>",
+              "accessKeyId": "<access_key_id>",
+              "secretAccessKey": "<secret_access_key>"
+          },
+          "s3": {
+              "bucket": "<bucket_name>"
+          }
+      },
+      'azure': {
+          "accountName": "<account_name>",
+          "accountKey": "<account_key>",
+          "containerName": "<container_name>"
+      },
+      'gcloud': {
+          "projectId": "<project_id>",
+          "bucketName": "<bucket_name>"
+      },
+      'minio': {
+        "endPoint": "localhost",
+        "port": "9000",
+        "bucketName": "static",
+        "accesskeyid": 'KT5KRrCqk62KSHu8',
+        "secretaccesskey": 'sMelEcokbZcYbRWRjLKasMSO8j5qkFPt',
+      }
     }
 });
 
