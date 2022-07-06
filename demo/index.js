@@ -112,13 +112,13 @@ async function run() {
 
 
   // Minio
-  await StaticStorage.listFiles().then(r => console.log(util.inspect(r.map(({Key}) => Key), {depth: 5, colors: true})));
+  await StaticStorage.listFiles().then(r => console.log(util.inspect(r.Contents.map(({Key}) => Key), {depth: 5, colors: true})));
   await StaticStorage.upload('demo.txt', 'demo.txt');
   await StaticStorage.copy('demo.txt', 'demo2.txt');
   await StaticStorage.move('demo.txt', 'tmp/demo2.txt');
   await StaticStorage.upload('./demo.txt', 'test/demo.txt');
   await StaticStorage.uploadToTmp('demo.txt', 'demo-2.txt');
-  await StaticStorage.listFiles().then(r => console.log(util.inspect(r.map(({Key}) => Key), {depth: 5, colors: true})));
+  await StaticStorage.listFiles().then(r => console.log(util.inspect(r.Contents.map(({Key}) => Key), {depth: 5, colors: true})));
   await StaticStorage.removeFolder('test');
   await StaticStorage.downloadToLocalTmp('demo2.txt');
   await StaticStorage.downloadToLocalTmp('tmp/demo2.txt');
@@ -126,7 +126,7 @@ async function run() {
   await StaticStorage.remove('demo2.txt');
   await StaticStorage.remove('tmp/demo2.txt');
   await StaticStorage.remove('tmp/demo-2.txt');
-  await StaticStorage.listFiles().then(r => console.log(util.inspect(r.map(({Key}) => Key), {depth: 5, colors: true})));
+  await StaticStorage.listFiles().then(r => console.log(util.inspect(r.Contents.map(({Key}) => Key), {depth: 5, colors: true})));
 
   // Local
   //await StaticStorage.upload('demo/demo.txt', 'memo/tempFileName.txt');            // Upload file

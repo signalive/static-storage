@@ -93,11 +93,13 @@ class Minio {
             });
 
             stream.on('data', function(obj) {
-                list.push({Key: obj.name});
+                list.push(obj);
             });
 
-            stream.on('end', function (obj) {
-                resolve(list);
+            stream.on('end', function () {
+                resolve({
+                  Contents: list.map(obj => ({Key: obj.name}))
+                });
             });
         });
     }
@@ -137,7 +139,7 @@ class Minio {
      */
     async removeFolder(folderPath) {
         debug(`Removing folder at ${folderPath}`);
-        const files = await this.listFiles(folderPath);
+        const {Contents: files} = await this.listFiles(folderPath);
         await this.minio.removeObjects(this.bucketName, files.map(({Key}) => Key));
     }
 
