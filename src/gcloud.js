@@ -111,7 +111,7 @@ class GCloud {
         return mkdirp(path.join('./', this.tmpFolderPath))
             .then(() => {
                 const tmpFileName = path.join('./', this.tmpFolderPath,
-                    new Date().getTime() + downloadPath.slice(downloadPath.lastIndexOf('.')));
+                    new Date().getTime() + (Math.random() + 1).toString(36).substring(6) + downloadPath.slice(downloadPath.lastIndexOf('.')));
 
                 return this.instance
                     .bucket(this.bucketName)
