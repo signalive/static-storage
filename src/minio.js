@@ -114,7 +114,7 @@ class Minio {
         await mkdirp(path.join('./', this.tmpFolderPath));
 
         const tmpFileName = path.join('./', this.tmpFolderPath,
-            new Date().getTime() + downloadPath.slice(downloadPath.lastIndexOf('.')));
+            new Date().getTime() + (Math.random() + 1).toString(36).substring(6) + downloadPath.slice(downloadPath.lastIndexOf('.')));
         await this.minio.fGetObject(this.bucketName, downloadPath, tmpFileName);
 
         return tmpFileName;

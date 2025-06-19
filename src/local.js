@@ -74,7 +74,7 @@ class local {
         return mkdirp(path.join('./', this.tmpFolderPath))
             .then(() => new Promise((resolve, reject) => {
                 const tmpFileName = path.join('./', this.tmpFolderPath,
-                    new Date().getTime() + downloadPath.slice(downloadPath.lastIndexOf('.')));
+                    new Date().getTime() + (Math.random() + 1).toString(36).substring(6) + downloadPath.slice(downloadPath.lastIndexOf('.')));
 
                 const readStream = fs.createReadStream(path.join(this.rootPath, downloadPath));
                 const writeStream = fs.createWriteStream(tmpFileName);
