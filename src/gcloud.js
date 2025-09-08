@@ -2,7 +2,7 @@
 
 const path = require('path');
 const mkdirp = require('mkdirp-then');
-const Storage = require('@google-cloud/storage');
+const { Storage } = require('@google-cloud/storage');
 const debug = require('debug')('static-storage:gcloud');
 
 
@@ -11,7 +11,7 @@ class GCloud {
         this.config = configParams;
         this.tmpFolderPath = configParams.staticstorage.tmpFolderPath.slice(1);
         this.bucketName = configParams.gcloud.bucketName;
-        this.instance = Storage({
+        this.instance = new Storage({
           projectId: configParams.gcloud.projectId
         });
         this.checkContainer();
