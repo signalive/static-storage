@@ -94,10 +94,10 @@ class GCloud {
      * Generic list method to list files of current google cloud bucket.
      * @returns {Promise}
      */
-    listFiles() {
+    listFiles(prefix = '') {
         return this.instance
           .bucket(this.bucketName)
-          .getFiles()
+          .getFiles({prefix})
           .then(files => ({ Contents: files[0].map(f => ({ Key: f.name }))}));
     }
 
