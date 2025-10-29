@@ -100,7 +100,13 @@ class GCloud {
         return this.instance
           .bucket(this.bucketName)
           .getFiles({prefix})
-          .then(files => ({ Contents: files[0].map(f => ({ ...f, Key: f.name }))}));
+          .then(files => {
+              const fileList = files[0].map(f => {
+                  f.Key = f.name;
+                  return f;
+              });
+              return { Contents: fileList };
+          });
     }
 
 
