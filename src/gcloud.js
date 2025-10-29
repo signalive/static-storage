@@ -62,7 +62,7 @@ class GCloud {
         return this.instance
             .bucket(this.bucketName)
             .upload(src, {
-                destination: this.addSlash_(dst),
+                destination: dst,
                 resumable: this.config.gcloud.resumable || false
             })
             .then(response => {
