@@ -63,7 +63,7 @@ class GCloud {
             .bucket(this.bucketName)
             .upload(src, {
                 destination: dst,
-                resumable: this.config.gcloud.resumable || false
+                resumable: false
             })
             .then(response => {
                 debug(`Upload finished for ${src}`);
@@ -83,7 +83,7 @@ class GCloud {
             .bucket(this.bucketName)
             .upload(src, {
                 destination: this.tmpFolderPath + this.addSlash_(dst),
-                resumable: this.config.gcloud.resumable || false
+                resumable: false
             })
             .then(response => {
                 debug(`Upload finished for ${src} to ${this.tmpFolderPath + this.addSlash_(dst)}`);
