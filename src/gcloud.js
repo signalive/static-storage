@@ -2,7 +2,7 @@
 
 const path = require('path');
 const mkdirp = require('mkdirp-then');
-const Storage = require('@google-cloud/storage');
+const {Storage} = require('@google-cloud/storage');
 const debug = require('debug')('static-storage:gcloud');
 
 
@@ -11,7 +11,7 @@ class GCloud {
         this.config = configParams;
         this.tmpFolderPath = configParams.staticstorage.tmpFolderPath.slice(1);
         this.bucketName = configParams.gcloud.bucketName;
-        this.instance = Storage({
+        this.instance = new Storage({
           projectId: configParams.gcloud.projectId
         });
         this.checkContainer();
@@ -62,7 +62,8 @@ class GCloud {
         return this.instance
             .bucket(this.bucketName)
             .upload(src, {
-                destination: this.addSlash_(dst)
+                destination: dst,
+                resumable: false
             })
             .then(response => {
                 debug(`Upload finished for ${src}`);
@@ -81,7 +82,8 @@ class GCloud {
         return this.instance
             .bucket(this.bucketName)
             .upload(src, {
-                destination: this.tmpFolderPath + this.addSlash_(dst)
+                destination: this.tmpFolderPath + this.addSlash_(dst),
+                resumable: false
             })
             .then(response => {
                 debug(`Upload finished for ${src} to ${this.tmpFolderPath + this.addSlash_(dst)}`);
@@ -94,11 +96,15 @@ class GCloud {
      * Generic list method to list files of current google cloud bucket.
      * @returns {Promise}
      */
-    listFiles() {
+    listFiles(prefix = '') {
         return this.instance
           .bucket(this.bucketName)
-          .getFiles()
-          .then(files => ({ Contents: files[0].map(f => ({ Key: f.name }))}));
+          .getFiles({prefix})
+          .then(([files]) => ({
+              Contents: files.map(f => ({
+                  Key: f.name
+              }))
+          }));
     }
 
 
