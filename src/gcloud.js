@@ -11,9 +11,17 @@ class GCloud {
         this.config = configParams;
         this.tmpFolderPath = configParams.staticstorage.tmpFolderPath.slice(1);
         this.bucketName = configParams.gcloud.bucketName;
-        this.instance = new Storage({
-          projectId: configParams.gcloud.projectId
-        });
+
+        const credentials = {};
+        if (configParams.gcloud.keyFilename) {
+          credentials.keyFilename = configParams.gcloud.keyFilename;
+        } else if (!!process.env.GOOGLE_APPLICATION_CREDENTIALS && !!configParams.gcloud.projectId) {
+          credentials.projectId = configParams.gcloud.projectId;
+        } else {
+          throw new Error('Either keyFilename or GOOGLE_APPLICATION_CREDENTIALS must be provided');
+        }
+
+        this.instance = new Storage(credentials);
         this.checkContainer();
     }
 
