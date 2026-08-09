@@ -9,7 +9,7 @@
   "dependencies": {
     "@google-cloud/storage": "7.17.2",
     "aws-sdk": "2.125.0",
-    "azure-storage": "2.5.0",
+    "azure-storage": "2.10.7",
     "debug": "2.6.9",
     "fs-list": "0.0.1",
     "ibm-cos-sdk": "1.15.1",
