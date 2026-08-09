@@ -1,6 +1,6 @@
 'use strict';
 
-const S3 = require('./s3');
+const S3 = require('./aws');
 const Storage = require('ibm-cos-sdk');
 
 
