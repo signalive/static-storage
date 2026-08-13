@@ -42,11 +42,11 @@ class s3 {
      * @param {string} dst
      * @returns {Promise}
      */
-    upload(src, dst) {
+    upload(src, dst, options = {}) {
         return this.uploadToS3(src, {
             Bucket: this.bucketName,
             Key: dst,
-            ACL: 'public-read'
+            
         });
     }
 
@@ -61,7 +61,6 @@ class s3 {
         return this.uploadToS3(src, {
             Bucket: this.bucketName,
             Key: this.tmpFolderPath + this.addSlash_(dst),
-            ACL: 'public-read'
         });
     }
 
@@ -265,7 +264,6 @@ class s3 {
                 Bucket: this.bucketName,
                 CopySource: this.bucketName + this.addSlash_(src),
                 Key: dst,
-                ACL: 'public-read'
             }, (err, data) => {
                 if (err) {
                     debug('Could not copy file.', err);
